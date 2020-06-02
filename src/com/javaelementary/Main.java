@@ -1,37 +1,26 @@
 package com.javaelementary;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(String[] args) {
-        countNames("Ben Carl  Den   Mary Mary");
+        System.out.println(countNames("Ben  Carl   Mariia Ben Alex"));
     }
 
-    private static void countNames(String names) {
-        names = names.trim();
-        StringBuilder stringBuilder = new StringBuilder(names);
-        for (int i = stringBuilder.length() - 1; i >= 0; i--) {
-            if (stringBuilder.charAt(i) == ' ' && stringBuilder.charAt(i + 1) == ' ') {
-                stringBuilder.deleteCharAt(i);
-            }
+    private static Map<String, Long> countNames(String names) {
+        if (names == null || names.trim().equals("")) {
+            return null;
         }
-        Map<String, Integer> map = new HashMap<>();
-        String[] strings = stringBuilder.toString().split(" ");
-        for (int i = 0; i < strings.length; i++) {
-            if (map.containsKey(strings[i])) {
-                int count = map.get(strings[i]);
-                count++;
-                map.put(strings[i], count);
-            } else {
-                map.put(strings[i], 1);
-            }
-        }
-        List<Map.Entry<String, Integer>> list = new ArrayList<>(map.entrySet());
-        list.sort((o1, o2) -> Integer.compare(o2.getValue(), o1.getValue()));
-        System.out.println(list);
+        return Arrays.stream(names.split("\\s+"))
+                .collect(Collectors.groupingBy(v -> v, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
     }
 }
